@@ -23,7 +23,6 @@ $(document).ready(function () {
                 if (data.success) {
                     console.log('haha lol');
                     $('#mainContainer').html('');
-                    // convert object to array
                     let company = data.message;
                     for (let key in company) {
                         if (company.hasOwnProperty(key)) {

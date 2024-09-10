@@ -33,8 +33,6 @@ class Company extends Model
             while (Company::where('company_db', $company_db)->exists()) {
                 $company_db = rand(100000, 999999);
             }
-
-
             // Insert values into the database
             $company = new Company();
             $company->name = $data['name'];
@@ -70,7 +68,6 @@ class Company extends Model
         $company_db = Company::where('id', $data['company'])->pluck('company_db')->first();
 
         if ($company_db) {
-            // Register the new database connection dynamically
             config(['database.connections.company_' . $company_db => [
                 'driver' => 'mysql',
                 'host' => env('DB_HOST', '127.0.0.1'),
@@ -86,12 +83,14 @@ class Company extends Model
             ]]);
 
             Artisan::call('config:clear');
-
             DB::setDefaultConnection('company_' . $company_db);
-
             $currentDatabase = DB::connection()->getDatabaseName();
 
-            return response()->json(['success' => true, 'message' => 'Company selected successfully', 'database' => $currentDatabase]);
+            if ($currentDatabase) {
+                return response()->json(['success' => true, 'message' => 'Company selected successfully', 'database' => $currentDatabase]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Company not found']);
+            }
         } else {
             return response()->json(['success' => false, 'message' => 'Company not found']);
         }

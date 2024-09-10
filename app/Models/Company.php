@@ -56,43 +56,13 @@ class Company extends Model
                 'engine' => null,
             ]]);
             Artisan::call('config:clear');
-            Artisan::call('migrate', ['--database' => 'company_' . $company_db]);
+            Artisan::call('migrate', [
+                '--database' => 'company_' . $company_db,
+                '--path' => 'database/migrations/Company'
+            ]);
 
             $finalResponse = ['success' => true, 'message' => 'Company created successfully'];
         }
         return $finalResponse;
-    }
-
-    public function select_company_db($data): JsonResponse
-    {
-        $company_db = Company::where('id', $data['company'])->pluck('company_db')->first();
-
-        if ($company_db) {
-            config(['database.connections.company_' . $company_db => [
-                'driver' => 'mysql',
-                'host' => env('DB_HOST', '127.0.0.1'),
-                'port' => env('DB_PORT', '3308'),
-                'database' => 'company_' . $company_db,
-                'username' => env('DB_USERNAME', 'root'),
-                'password' => env('DB_PASSWORD', 'Admin123###'),
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => true,
-                'engine' => null,
-            ]]);
-
-            Artisan::call('config:clear');
-            DB::setDefaultConnection('company_' . $company_db);
-            $currentDatabase = DB::connection()->getDatabaseName();
-
-            if ($currentDatabase) {
-                return response()->json(['success' => true, 'message' => 'Company selected successfully', 'database' => $currentDatabase]);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Company not found']);
-            }
-        } else {
-            return response()->json(['success' => false, 'message' => 'Company not found']);
-        }
     }
 }

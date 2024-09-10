@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use \Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -27,7 +28,13 @@ class CompanyController extends Controller
             'company' => 'required|numeric',
         ]);
 
-        $company = new Company();
-        return $company->select_company_db($validatedData);
+        // Since the middleware handles database switching, just return success
+        $currentDatabase = DB::connection()->getDatabaseName();
+
+        if ($currentDatabase) {
+            return response()->json(['success' => true, 'message' => 'Company selected successfully', 'database' => $currentDatabase]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Company not found']);
+        }
     }
 }
